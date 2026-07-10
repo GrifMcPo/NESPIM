@@ -12,7 +12,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID", "0"))
 RCON_HOST = "f1.rustix.me"
-RCON_PORT = 25575
+RCON_PORT = 30529
 RCON_PASS = "__871410__grifmcproRCON"
 
 logging.basicConfig(level=logging.INFO)
