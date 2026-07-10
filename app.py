@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+import threading
 import socket
 import struct
 from flask import Flask
@@ -10,7 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 # --- НАСТРОЙКИ ---
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID", "0"))
-RCON_HOST = "f1.rustix.me"  # твой IP
+RCON_HOST = "f1.rustix.me"
 RCON_PORT = 25575
 RCON_PASS = "__871410__grifmcproRCON"
 
@@ -71,12 +72,19 @@ async def rcon_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"❌ Ошибка: {e}")
 
-# --- ЗАПУСК БОТА В ФОНЕ ---
+# --- ЗАПУСК БОТА В ОТДЕЛЬНОМ ПОТОКЕ ---
 def run_bot():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("rcon", rcon_cmd))
-    app.run_polling()
+    
+    loop.run_until_complete(app.initialize())
+    loop.run_until_complete(app.start())
+    loop.run_until_complete(app.updater.start_polling())
+    loop.run_forever()
 
 # --- FLASK ДЛЯ RENDER ---
 app = Flask(__name__)
@@ -92,7 +100,6 @@ def health():
 # --- ТОЧКА ВХОДА ---
 if __name__ == "__main__":
     # Запускаем бота в отдельном потоке
-    import threading
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
     
