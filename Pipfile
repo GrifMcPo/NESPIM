@@ -1,12 +1,1 @@
-[[source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
-name = "pypi"
-
-[packages]
-python-telegram-bot = "==20.7"
-Flask = "==3.0.3"
-aiogram = "==3.10.0"
-
-[requires]
-python_version = "3.11"
+pip install -r requirements.txt
